@@ -9,14 +9,9 @@
 </template>
 
 <script setup lang="ts">
-interface ITask {
-  id: number;
-  text: string;
-};
+import {toRefs, PropType} from "vue";
 
-import {ComponentObjectPropsOptions, toRefs} from "vue";
-
-const props = defineProps<ComponentObjectPropsOptions<ITask>>({
+const props = defineProps({
   id: { type: Number },
   text: { type: String },
 });

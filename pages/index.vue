@@ -5,7 +5,13 @@
         On holds ({{ count }})
       </section>
       <section class="columns__cards">
-        task-card
+        <column-card
+          v-for="(column) in columns"
+          :key="column.id"
+          :name="column.name"
+          :tasks="column.tasks"
+          :type="column.type"
+        />
       </section>
       <section class="columns__buttons">
         <button></button>
@@ -13,3 +19,8 @@
     </div>
   </div>
 </template>
+<script setup>
+const columnStore = useColumnStore();
+
+const { columns } = storeToRefs(columnStore);
+</script>

@@ -11,4 +11,13 @@ export default defineNuxtConfig({
       }
     }
   },
+  modules: [
+    '@pinia/nuxt',
+  ],
+  pinia: {
+    storesDirs: ['./stores/**'],
+  },
+  imports: {
+    dirs: ['./types/*.ts', '/stores/**'],
+  },
 })
