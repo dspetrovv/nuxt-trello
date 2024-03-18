@@ -3,7 +3,14 @@
   --header-height: 65px;
   --footer-height: 180px;
 
-  --background-color: #f8f8f8;
+  --white-color: #f8f8f8;
+  --white-color-secondary: #eaeaea;
+  --base-color: #808787;
+  --light-gray-color: #373b40;
+  --gray-color: #2f3137;
+  --gray-color-secondary: #505050;
+  --gray-color-third: #5f6163;
+  --dark-gray-color: #1e2021;
 }
 
 body {
@@ -12,7 +19,8 @@ body {
   width: 100%;
   height: 100vh;
   font-size: 20px;
-  background-color: var(--background-color);
+  background-color: var(--light-gray-color);
+  color: var(--light-gray-color);
   > div.__nuxt {
     min-height: 100vh;
     display: flex;
