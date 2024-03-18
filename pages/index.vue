@@ -12,9 +12,14 @@
   </div>
 </template>
 <script setup>
+import {onMounted} from "vue";
 const columnStore = useColumnStore();
 
 const { columns } = storeToRefs(columnStore);
+
+onMounted(() => {
+  columnStore.getColumns();
+});
 </script>
 <style lang="scss" scoped>
 .columns {
