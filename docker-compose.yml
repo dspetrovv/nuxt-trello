@@ -1,0 +1,11 @@
+version: '1'
+
+services:
+  vue:
+    build: .
+    container_name: nuxt-trello
+    command: npm run dev
+    ports:
+      - "23000:3000"
+    volumes:
+      - ./:/application
