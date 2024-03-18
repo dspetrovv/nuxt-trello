@@ -3,17 +3,18 @@
     <section :class="['column__header', `column__header_${type}`]">
       {{ name }} ({{ count }})
     </section>
-    <section class="column__cards">
+    <section class="column__cards" v-if="tasks.length">
       <task-card
         v-for="(task) in tasks"
         :key="task.id"
         :id="task.id"
-        :text="task.text"
+        :description="task.description"
+        @deleteTask="deleteTask"
       />
     </section>
     <section v-show="isActionsOpen" class="column__actions">
       <textarea
-        v-model="taskText"
+        v-model="taskDescription"
         name="text"
         rows="5"
         cols="5"
@@ -24,7 +25,7 @@
         <span
           class="column__actions-close"
           @click="openActions"
-        >X</span>
+        ></span>
       </div>
     </section>
     <section
@@ -37,35 +38,34 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import {
-  computed,
-  ref,
-  toRefs
-} from "vue";
+<script setup>
+import {ref} from "vue";
 
 const props = defineProps({
+  idx: { type: Number, default: 0 },
   name: { type: String, default: '' },
-  tasks: { type: [], default: [] },
+  tasks: { type: Array, default: [] },
   type: { type: String, default: '' },
+  count: { type: Number, default: 0 },
 });
 
-const { name, tasks } = toRefs(props);
-
-const taskText = ref('');
+const taskDescription = ref('');
 const isActionsOpen = ref(false);
-const count = computed(() => {
-  return tasks.length;
-});
 
 const columnStore = useColumnStore();
 
-const addTask = () => {
-  columnStore.createTask(taskText);
-};
-
 const openActions = () => {
   isActionsOpen.value = !isActionsOpen.value;
+};
+
+const addTask = () => {
+  columnStore.createTask({ idx: props.idx, description: taskDescription.value });
+  taskDescription.value = '';
+  openActions();
+};
+
+const deleteTask = (id) => {
+  columnStore.deleteTask({ idx: props.idx, taskId: id })
 };
 </script>
 
@@ -73,12 +73,12 @@ const openActions = () => {
 .column {
   width: 356px;
   background-color: var(--gray-color);
+  height: fit-content;
   &__header {
-    text-transform: capitalize;
+    text-transform: uppercase;
     color: var(--white-color);
     font-size: 32px;
     padding: 10px;
-    padding-bottom: 0;
     &_on-hold {
       background-color: #e8814b;
     }
@@ -103,7 +103,6 @@ const openActions = () => {
     flex-direction: column;
     gap: 15px;
     padding: 10px;
-    padding-top: 0;
     textarea {
       background-color: var(--gray-color-secondary);
       padding: 10px;
@@ -113,6 +112,12 @@ const openActions = () => {
       font-size: 16px;
       border: 0;
       resize: none;
+      &::-webkit-scrollbar {
+        width: 5px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--dark-gray-color);
+      }
     }
     &-button {
       display: flex;

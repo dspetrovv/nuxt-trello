@@ -1,10 +1,6 @@
 export interface ITask {
   id: number;
-  text: string;
-};
-
-interface IColumnCardProps {
-  name: string;
+  description: string;
 };
 
 export interface IColumn {

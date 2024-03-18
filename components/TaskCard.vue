@@ -1,22 +1,25 @@
 <template>
   <div class="task">
-    <div class="task__id">
-      <span>id:&nbsp;</span>
+    <span class="task__delete" @click="deleteTask"></span>
+    <div>
+      <span class="task__id">id:&nbsp;</span>
       <span>{{ id }}</span>
     </div>
-    <div>{{ text }}</div>
+    <div class="task__description">{{ description }}</div>
   </div>
 </template>
 
-<script setup lang="ts">
-import {toRefs, PropType} from "vue";
-
+<script setup>
 const props = defineProps({
   id: { type: Number },
-  text: { type: String },
+  description: { type: String },
 });
 
-const { id, text } = toRefs(props);
+const emit = defineEmits(['deleteTask']);
+
+const deleteTask = () => {
+  emit('deleteTask', props.id)
+};
 </script>
 
 <style lang="scss" scoped>
@@ -24,30 +27,39 @@ const { id, text } = toRefs(props);
   background-color: var(--dark-gray-color);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 15px;
   position: relative;
-  padding: 20px 10px;
+  padding: 25px 10px;
   &__id {
-    &:first-child {
-      color: var(--white-color);
+    color: var(--white-color);
+  }
+  position: relative;
+  &__delete {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 15px;
+      height: 2px;
+      background-color: var(--light-gray-color);
+      top: 10px;
+      right: 5px;
+    }
+    &::before {
+      transform: rotate(45deg);
+    }
+    &::after {
+      transform: rotate(-45deg);
     }
   }
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    width: 10px;
-    height: 1px;
-    background-color: var(--light-gray-color);
-  }
-  &::before {
-    right: 10px;
-    transform: rotate(45deg);
-  }
-  &::after {
-    top: 7px;
-    right: 10px;
-    transform: rotate(-45deg);
+  &__description {
+    white-space: break-spaces;
   }
 }
 </style>
