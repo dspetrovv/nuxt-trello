@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { IColumn } from "../types/card";
 
 const mockState = [
   { id: 0, name: 'Column 1', type: 'on-hold', tasks: [
@@ -18,17 +19,45 @@ export const useColumnStore = defineStore('column', {
     columns: mockState as IColumn[],
   }),
   actions: {
+    saveColumns() {
+      localStorage.setItem('columns', JSON.stringify(this.columns))
+    },
     getColumns() {
-      this.columns = JSON.parse(localStorage.getItem('columns'));
+      this.columns = JSON.parse(localStorage.getItem('columns')!);
     },
     createTask({ idx, description }: { idx: number, description: string }) {
       this.columns[idx].tasks.push({ id: Math.random(), description });
-      localStorage.setItem('columns', JSON.stringify(this.columns))
+      this.saveColumns();
     },
     deleteTask({ taskId, idx }: { taskId: number, idx: number }) {
       const index = this.columns[idx].tasks.findIndex((task) => task.id === taskId);
       this.columns[idx].tasks.splice(index, 1)
-      localStorage.setItem('columns', JSON.stringify(this.columns))
+      this.saveColumns();
+    },
+    moveTask({
+        taskId,
+        taskIdx,
+        currentColumnIndex,
+        targetColumnIndex,
+        prevTaskId,
+      }: {
+      taskId: number,
+      taskIdx: number,
+      currentColumnIndex: number, // индекс текущей колонки
+      targetColumnIndex: number, // индекс таргетной колонки
+      prevTaskId: string | undefined,
+    }) {
+      const task = this.columns[currentColumnIndex].tasks.find((task) => task.id === taskId);
+      this.columns[currentColumnIndex].tasks.splice(taskIdx, 1);
+
+      const prevTaskIndex = this.columns[targetColumnIndex].tasks.findIndex((task) => `${task.id}` === prevTaskId);
+
+      if (prevTaskIndex !== -1) {
+        this.columns[targetColumnIndex].tasks.splice(prevTaskIndex + 1, 0, task)
+      } else {
+        this.columns[targetColumnIndex].tasks.unshift(task);
+      }
+      this.saveColumns();
     },
   },
 });

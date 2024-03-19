@@ -1,11 +1,15 @@
 <template>
-  <div class="task">
+  <div
+    class="task"
+    :data-id="id"
+    @mousedown.self="onMouseDown"
+  >
     <span class="task__delete" @click="deleteTask"></span>
-    <div>
-      <span class="task__id">id:&nbsp;</span>
-      <span>{{ id }}</span>
+    <div draggable="false">
+      <span class="task__id" draggable="false">id:&nbsp;</span>
+      <span draggable="false">{{ id }}</span>
     </div>
-    <div class="task__description">{{ description }}</div>
+    <div class="task__description" draggable="false">{{ description }}</div>
   </div>
 </template>
 
@@ -13,23 +17,37 @@
 const props = defineProps({
   id: { type: Number },
   description: { type: String },
+  idx: { type: Number },
 });
 
-const emit = defineEmits(['deleteTask']);
+const emit = defineEmits(['deleteTask', 'moveTask']);
 
 const deleteTask = () => {
   emit('deleteTask', props.id)
 };
+
+const handleMoveTask = ({ targetColumnIndex, prevTaskId }) => {
+  emit('moveTask', {
+    taskId: props.id,
+    taskIdx: props.idx,
+    targetColumnIndex,
+    prevTaskId,
+  });
+};
+
+const { onMouseDown } = useDragNDrop(handleMoveTask);
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .task {
   background-color: var(--dark-gray-color);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
   position: relative;
   padding: 25px 10px;
+  cursor: move;
+  span {
+    user-select: none;
+    pointer-events: none;
+  }
   &__id {
     color: var(--white-color);
   }
@@ -59,7 +77,19 @@ const deleteTask = () => {
     }
   }
   &__description {
+    user-select: none;
+    pointer-events: none;
     white-space: break-spaces;
+    margin-top: 15px;
+  }
+  &__placeholder {
+    background-color: none;
+    padding: 0;
+  }
+  &_empty {
+    cursor: initial;
+    background: none;
+    padding: 5px;
   }
 }
 </style>

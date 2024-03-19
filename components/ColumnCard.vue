@@ -1,16 +1,20 @@
 <template>
-  <div class="column">
+  <div class="column" :data-index="idx">
     <section :class="['column__header', `column__header_${type}`]">
       {{ name }} ({{ count }})
     </section>
-    <section class="column__cards" v-if="tasks.length">
+    <section :class="{column__cards: true, column__cards_empty: !tasks.length}">
       <task-card
-        v-for="(task) in tasks"
+        v-if="tasks.length"
+        v-for="(task, idx) in tasks"
         :key="task.id"
         :id="task.id"
         :description="task.description"
+        :idx="idx"
         @deleteTask="deleteTask"
+        @moveTask="moveTask"
       />
+      <div v-else class="task task_empty"></div>
     </section>
     <section v-show="isActionsOpen" class="column__actions">
       <textarea
@@ -67,9 +71,13 @@ const addTask = () => {
 const deleteTask = (id) => {
   columnStore.deleteTask({ idx: props.idx, taskId: id })
 };
+
+const moveTask = (params) => {
+  columnStore.moveTask({ ...params, currentColumnIndex: props.idx });
+};
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .column {
   width: 356px;
   background-color: var(--gray-color);
@@ -97,6 +105,9 @@ const deleteTask = (id) => {
     flex-direction: column;
     gap: 10px;
     padding: 10px;
+    &_empty {
+      padding: 0 10px;
+    }
   }
   &__actions {
     display: flex;

@@ -18,6 +18,6 @@ export default defineNuxtConfig({
     storesDirs: ['./stores/**'],
   },
   imports: {
-    dirs: ['./types/*.ts', '/stores/**'],
+    dirs: ['/stores/**', './hooks/*.ts'],
   },
 })
