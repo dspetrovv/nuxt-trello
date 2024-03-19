@@ -1,5 +1,14 @@
 import { defineStore } from "pinia";
-import { IColumn } from "../types/card";
+
+interface ITask {
+  id: number;
+  description: string;
+};
+
+interface IColumn {
+  name: string;
+  tasks: ITask[];
+};
 
 const mockState = [
   { id: 0, name: 'Column 1', type: 'on-hold', tasks: [
