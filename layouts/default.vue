@@ -1,14 +1,11 @@
 <template>
-  <header class="header">
-  </header>
-  <main>
+  <LayoutHeader />
+  <main class="main">
     <slot></slot>
   </main>
 </template>
 <style lang="scss">
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.main {
+  margin: 0 15px;
 }
 </style>
