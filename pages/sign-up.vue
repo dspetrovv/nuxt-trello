@@ -1,5 +1,5 @@
 <template>
-  <ClientOnly>
+  <div>
     <h1 class="login-title">Регистрация</h1>
     <form class="login" type="POST" @submit.prevent="signup">
       <div class="login__input">
@@ -33,12 +33,11 @@
         </button>
       </div>
     </form>
-  </ClientOnly>
+  </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { storeToRefs } from 'pinia';
 
 useHead({
   title: 'Регистрация',

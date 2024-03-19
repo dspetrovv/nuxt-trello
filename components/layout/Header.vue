@@ -11,10 +11,18 @@
       <div :class="{'header-nav': true, 'header-nav_active': isMenuActive}">
         <ul>
           <li>
-            <nuxt-link to="/sign-in">Вход</nuxt-link>
+            <nuxt-link to="/">
+              <img src="~/assets/image/logo.svg" alt="logo" @click="toggleBurger">
+            </nuxt-link>
           </li>
           <li>
-            <nuxt-link to="/sign-in">Регистрация</nuxt-link>
+            <nuxt-link to="/" @click="toggleBurger">Главная</nuxt-link>
+          </li>
+          <li>
+            <nuxt-link to="/sign-in" @click="toggleBurger">Вход</nuxt-link>
+          </li>
+          <li>
+            <nuxt-link to="/sign-up" @click="toggleBurger">Регистрация</nuxt-link>
           </li>
         </ul>
       </div>
@@ -25,8 +33,12 @@
         <h2>Trello like</h2>
       </div>
       <div class="header-buttons">
-        <nuxt-link class="header__button" to="sign-in">Вход</nuxt-link>
-        <nuxt-link class="header__button" to="sign-up">Регистрация</nuxt-link>
+        <nuxt-link class="header__button" to="sign-in">
+          Вход
+        </nuxt-link>
+        <nuxt-link class="header__button" to="sign-up">
+          Регистрация
+        </nuxt-link>
       </div>
     </div>
   </header>
@@ -145,6 +157,9 @@ const toggleBurger = () => {
     &-buttons {
       visibility: hidden;
       width: 0;
+      a {
+        display: none;
+      }
     }
     &-nav {
       display: block;
@@ -162,14 +177,19 @@ const toggleBurger = () => {
       ul {
         text-align: center;
         > li {
-          padding-top: 20px;
+          padding-top: 5vw;
           font-size: 34px;
           display: block;
           a {
             color: var(--base-color);
             text-decoration: none;
+            font-size: 7vw;
           }
         }
+      }
+      img {
+        width: 15vw;
+        height: auto;
       }
     }
   }

@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useCommonStore } from "./common";
 
 interface ITask {
   id: number;
@@ -67,6 +68,14 @@ export const useColumnStore = defineStore('column', {
         this.columns[targetColumnIndex].tasks.unshift(task);
       }
       this.saveColumns();
+      const commonStore = useCommonStore();
+      commonStore.setMessage({
+        message: '',
+        type: 'info',
+      });
+      setTimeout(() => {
+        commonStore.setMessage({message:'message', type: 'error'});
+      });
     },
   },
 });

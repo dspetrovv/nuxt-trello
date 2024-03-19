@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useCommonStore } from "./common";
 
 interface IUser {
   username: string;
@@ -9,7 +10,6 @@ export const useUserStore = defineStore('user', {
   state: () => ({
     user: {} as IUser,
     loggedIn: false,
-    error: '',
   }),
   actions: {
     checkIsLogged() {
@@ -22,7 +22,6 @@ export const useUserStore = defineStore('user', {
       { username, email, password }:
       { username: string, email: string, password: string }
       ) {
-      this.error = '';
       const { data, error } = await useFetch('/users/create', {
         method: 'post',
         params: {
@@ -31,9 +30,19 @@ export const useUserStore = defineStore('user', {
           password,
         }
       });
+      const commonStore = useCommonStore();
+      commonStore.setMessage({
+        message: '',
+        type: 'info',
+      });
       if (error.value) {
         this.user = {};
-        this.error = error.value.data.message;
+        setTimeout(() => {
+          commonStore.setMessage({
+            message: this.error.value.data.message,
+            type: 'error',
+          });
+        });
         this.loggedIn = false;
         return false;
       }
@@ -50,7 +59,6 @@ export const useUserStore = defineStore('user', {
       { username, password }:
       { username: string, password: string }
     ) {
-      this.error = '';
       const { data, error } = await useFetch('/users/token', {
         method: 'post',
         params: {
@@ -58,9 +66,19 @@ export const useUserStore = defineStore('user', {
           password,
         }
       });
+      const commonStore = useCommonStore();
+      commonStore.setMessage({
+        message: '',
+        type: 'info',
+      });
       if (error.value) {
         this.user = {};
-        this.error = error.value.data.message;
+        setTimeout(() => {
+          commonStore.setMessage({
+            message: this.error.value.data.message,
+            type: 'error',
+          });
+        });
         this.loggedIn = false;
         return false;
       }
@@ -97,9 +115,19 @@ export const useUserStore = defineStore('user', {
           refresh: JSON.parse(localStorage.getItem('refresh'))?.refresh,
         },
       });
+      const commonStore = useCommonStore();
+      commonStore.setMessage({
+        message: '',
+        type: 'info',
+      });
       if (error.value) {
         this.user = {};
-        this.error = error.value.data.message;
+        setTimeout(() => {
+          commonStore.setMessage({
+            message: this.error.value.data.message,
+            type: 'error',
+          });
+        });
         this.loggedIn = false;
         return false;
       }

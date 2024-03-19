@@ -1,5 +1,5 @@
 <template>
-  <ClientOnly>
+  <div>
     <h1 class="login-title">Вход</h1>
     <form class="login" type="POST" @submit.prevent="signin">
       <div class="login__input">
@@ -24,12 +24,11 @@
         </button>
       </div>
     </form>
-  </ClientOnly>
+  </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { storeToRefs } from 'pinia';
 
 useHead({
   title: 'Вход',
@@ -40,8 +39,6 @@ const password = ref('');
 
 const store = useUserStore();
 const router = useRouter();
-
-const { loggedRoute } = storeToRefs(store);
 
 const signin = async () => {
   const isSuccess = await store.signin({

@@ -13,6 +13,11 @@
 </template>
 <script setup>
 import {onMounted} from "vue";
+
+useHead({
+  title: 'Главная',
+});
+
 const columnStore = useColumnStore();
 
 const { columns } = storeToRefs(columnStore);
@@ -23,7 +28,8 @@ onMounted(() => {
 </script>
 <style lang="scss" scoped>
 .columns {
-  display: flex;
+  display: grid;
   gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(356px, 1fr));
 }
 </style>

@@ -32,3 +32,15 @@
     align-items: center;
   }
 }
+
+@media (max-width: 767px) {
+  .login {
+    &__button {
+      width: 100%;
+      cursor: pointer;
+    }
+    &-action {
+      width: 100%;
+    }
+  }
+}
