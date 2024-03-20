@@ -1,16 +1,15 @@
 <template>
-  <div class="column" :data-index="idx">
+  <div class="column" :data-index="row">
     <section :class="['column__header', `column__header_${type}`]">
-      {{ name }} ({{ count }})
+      {{ name }} ({{ tasks.length }})
     </section>
     <section :class="{column__cards: true, column__cards_empty: !tasks.length}">
       <task-card
         v-if="tasks.length"
-        v-for="(task, idx) in tasks"
+        v-for="(task) in tasks"
         :key="task.id"
         :id="task.id"
-        :description="task.description"
-        :idx="idx"
+        :text="task.text"
         @deleteTask="deleteTask"
         @moveTask="moveTask"
       />
@@ -28,14 +27,14 @@
         <button @click="addTask">Добавить карточку</button>
         <span
           class="column__actions-close"
-          @click="openActions"
+          @click="toggleActions"
         ></span>
       </div>
     </section>
     <section
       v-show="!isActionsOpen"
       class="column__add-button"
-      @click="openActions"
+      @click="toggleActions"
     >
       <span></span>&nbsp;&nbsp;Добавить карточку
     </section>
@@ -44,36 +43,41 @@
 
 <script setup>
 import {ref} from "vue";
+import { useCommonStore } from "../stores/common";
 
 const props = defineProps({
-  idx: { type: Number, default: 0 },
+  row: { type: String, default: '0' },
   name: { type: String, default: '' },
   tasks: { type: Array, default: [] },
   type: { type: String, default: '' },
-  count: { type: Number, default: 0 },
 });
 
 const taskDescription = ref('');
 const isActionsOpen = ref(false);
 
 const columnStore = useColumnStore();
+const commonStore = useCommonStore();
 
-const openActions = () => {
+const toggleActions = () => {
   isActionsOpen.value = !isActionsOpen.value;
 };
 
 const addTask = () => {
-  columnStore.createTask({ idx: props.idx, description: taskDescription.value });
+  if (!taskDescription.value.trim().length) {
+    commonStore.setMessage({ message: 'Поле не может быть пустым', type: 'error' });
+    return;
+  }
+  columnStore.createTask({ row: props.row, text: taskDescription.value });
   taskDescription.value = '';
-  openActions();
+  toggleActions();
 };
 
 const deleteTask = (id) => {
-  columnStore.deleteTask({ idx: props.idx, taskId: id })
+  columnStore.deleteTask({ taskId: id })
 };
 
 const moveTask = (params) => {
-  columnStore.moveTask({ ...params, currentColumnIndex: props.idx });
+  columnStore.moveTask({ ...params });
 };
 </script>
 

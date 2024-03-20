@@ -1,13 +1,28 @@
 <template>
   <div class="columns">
     <column-card
-      v-for="(column, idx) in columns"
-      :key="column.id"
-      :idx="idx"
-      :name="column.name"
-      :tasks="column.tasks"
-      :type="column.type"
-      :count="column.tasks.length"
+      :row="'0'"
+      :name="'on hold'"
+      :tasks="onHold"
+      :type="'on-hold'"
+    />
+    <column-card
+      :row="'1'"
+      :name="'in progress'"
+      :tasks="inProgress"
+      :type="'in-progress'"
+    />
+    <column-card
+      :row="'2'"
+      :name="'needs review'"
+      :tasks="needsReview"
+      :type="'needs-review'"
+    />
+    <column-card
+      :row="'3'"
+      :name="'approved'"
+      :tasks="approved"
+      :type="'approved'"
     />
   </div>
 </template>
@@ -20,7 +35,12 @@ useHead({
 
 const columnStore = useColumnStore();
 
-const { columns } = storeToRefs(columnStore);
+const {
+  onHold,
+  inProgress,
+  needsReview,
+  approved,
+} = storeToRefs(columnStore);
 
 onMounted(() => {
   columnStore.getColumns();

@@ -1,35 +1,28 @@
 import { defineStore } from "pinia";
-import { useCommonStore } from "./common";
+import { MessageType, useCommonStore } from "./common";
 
 interface ITask {
   id: number;
-  description: string;
-};
-
-interface IColumn {
-  name: string;
-  tasks: ITask[];
+  row: string;
+  seq_num: number;
+  text: string;
 };
 
 const mockState = [
-  { id: 0, name: 'Column 1', type: 'on-hold', tasks: [
-    { id: Math.random(), description: 'asd' },
-    { id: Math.random(), description: '123' },
-  ] },
-  { id: 1, name: 'Column 2', type: 'in-progress', tasks: [
-    { id: Math.random(), description: 'description' },
-    { id: Math.random(), description: 'qwerty' },
-    { id: Math.random(), description: 'row' },
-  ] },
-  { id: 3, name: 'Column 3', type: 'needs-review', tasks: [] },
+  { id: 0, row: '0', seq_num: 0, text: 'asd', },
+  { id: 1, row: '0', seq_num: 1, text: 'text', },
+  { id: 2, row: '0', seq_num: 2, text: 'desc', },
+  { id: 3, row: '1', seq_num: 0, text: '123', },
+  { id: 4, row: '1', seq_num: 1, text: 'row', },
+  { id: 5, row: '2', seq_num: 0, text: 'third', },
 ];
 
 export const useColumnStore = defineStore('column', {
   state: () => ({
-    columns: mockState as IColumn[],
+    tasks: mockState as ITask[],
   }),
   actions: {
-    setMessage({message, type}: {message: string, type: string}) {
+    setMessage({message, type}: {message: string, type: MessageType}) {
       const commonStore = useCommonStore();
       commonStore.setMessage({
         message: '',
@@ -43,45 +36,61 @@ export const useColumnStore = defineStore('column', {
       });
     },
     saveColumns() {
-      localStorage.setItem('columns', JSON.stringify(this.columns))
+      localStorage.setItem('columns', JSON.stringify(this.tasks))
     },
     getColumns() {
-      this.columns = JSON.parse(localStorage.getItem('columns')!);
+      this.tasks = JSON.parse(localStorage.getItem('columns')!);
     },
-    createTask({ idx, description }: { idx: number, description: string }) {
-      this.columns[idx].tasks.push({ id: Math.random(), description });
+    createTask({ row, text }: { row: string, text: string }) {
+      const seq_num = this.tasks.filter((task) => task.row === row).length;
+      this.tasks.push({ id: Math.random(), text, seq_num, row });
       this.saveColumns();
     },
-    deleteTask({ taskId, idx }: { taskId: number, idx: number }) {
-      const index = this.columns[idx].tasks.findIndex((task) => task.id === taskId);
-      this.columns[idx].tasks.splice(index, 1)
+    deleteTask({ taskId }: { taskId: number }) {
+      const index = this.tasks.findIndex((task) => task.id === taskId);
+      this.tasks.splice(index, 1);
       this.saveColumns();
     },
     moveTask({
         taskId,
-        taskIdx,
-        currentColumnIndex,
-        targetColumnIndex,
+        row,
         prevTaskId,
       }: {
       taskId: number,
-      taskIdx: number,
-      currentColumnIndex: number, // индекс текущей колонки
-      targetColumnIndex: number, // индекс таргетной колонки
-      prevTaskId: string | undefined,
+      row: string,
+      prevTaskId: string,
     }) {
-      const task = this.columns[currentColumnIndex].tasks.find((task) => task.id === taskId);
-      this.columns[currentColumnIndex].tasks.splice(taskIdx, 1);
+      const task = this.tasks.find((task) => task.id === taskId);
+      const index = this.tasks.findIndex((task) => task.id === taskId);
+      this.tasks[index].row = row;
 
-      const prevTaskIndex = this.columns[targetColumnIndex].tasks.findIndex((task) => `${task.id}` === prevTaskId);
+      const prevTask = this.tasks.find((task) => {
+        if (prevTaskId === null) {
+          return false;
+        }
+        return task.id === Number(prevTaskId);
+      })
+      
+      this.tasks[index].seq_num = Number(
+        prevTask?.seq_num ? prevTask.seq_num - 1 : 0
+      );
 
-      if (prevTaskIndex !== -1) {
-        this.columns[targetColumnIndex].tasks.splice(prevTaskIndex + 1, 0, task)
-      } else {
-        this.columns[targetColumnIndex].tasks.unshift(task);
-      }
       this.saveColumns();
-      this.setMessage({message: task.description, type: 'error'});
+      this.setMessage({message: task.text, type: 'error'});
+    },
+  },
+  getters: {
+    onHold: (state) => {
+      return state.tasks.filter((task) => task.row === '0');
+    },
+    inProgress: (state) => {
+      return state.tasks.filter((task) => task.row === '1');
+    },
+    needsReview: (state) => {
+      return state.tasks.filter((task) => task.row === '2');
+    },
+    approved: (state) => {
+      return state.tasks.filter((task) => task.row === '3');
     },
   },
 });

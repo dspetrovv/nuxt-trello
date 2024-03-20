@@ -9,15 +9,14 @@
       <span class="task__id" draggable="false">id:&nbsp;</span>
       <span draggable="false">{{ id }}</span>
     </div>
-    <div class="task__description" draggable="false">{{ description }}</div>
+    <div class="task__description" draggable="false">{{ text }}</div>
   </div>
 </template>
 
 <script setup>
 const props = defineProps({
   id: { type: Number },
-  description: { type: String },
-  idx: { type: Number },
+  text: { type: String },
 });
 
 const emit = defineEmits(['deleteTask', 'moveTask']);
@@ -29,8 +28,7 @@ const deleteTask = () => {
 const handleMoveTask = ({ targetColumnIndex, prevTaskId }) => {
   emit('moveTask', {
     taskId: props.id,
-    taskIdx: props.idx,
-    targetColumnIndex,
+    row: targetColumnIndex,
     prevTaskId,
   });
 };
