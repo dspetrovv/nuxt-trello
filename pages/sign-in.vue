@@ -15,6 +15,7 @@
           v-model="password"
           placeholder="password"
           type="password"
+          autocomplete="on"
           required
         >
       </div>

@@ -26,7 +26,9 @@
               <nuxt-link to="/sign-up" @click="toggleBurger">Регистрация</nuxt-link>
             </li>
           </template>
-          <li v-else>Выход</li>
+          <li v-else @click="logout">
+            <nuxt-link to="sign-in">Выход</nuxt-link>
+          </li>
         </ul>
       </div>
       <div class="header__title">
@@ -64,6 +66,11 @@ const { isLoggedIn } = storeToRefs(userStore)
 
 const toggleBurger = () => {
   isMenuActive.value = !isMenuActive.value;
+};
+
+const logout = () => {
+  userStore.logout();
+  toggleBurger();
 };
 </script>
 <style lang="scss" scoped>

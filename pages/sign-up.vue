@@ -24,6 +24,7 @@
           v-model="password"
           placeholder="password"
           type="password"
+          autocomplete="on"
           required
         >
       </div>
@@ -57,7 +58,7 @@ const signup = async () => {
     password: password.value,
   });
   if (isSuccess) {
-    router.replace('/');
+    router.replace('/sign-in');
   }
 };
 </script>
