@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { useCommonStore } from "./common";
+import { MessageType, useCommonStore } from "./common";
 
 interface IUser {
   username: string;
@@ -9,10 +9,10 @@ interface IUser {
 export const useUserStore = defineStore('user', {
   state: () => ({
     user: {} as IUser,
-    loggedIn: false,
+    isLoggedIn: false,
   }),
   actions: {
-    setMessage({message, type}: {message: string, type: string}) {
+    setMessage({message, type}: {message: string, type: MessageType}) {
       const commonStore = useCommonStore();
       commonStore.setMessage({
         message: '',
@@ -27,8 +27,8 @@ export const useUserStore = defineStore('user', {
     },
     checkIsLogged() {
       if (localStorage.getItem('userInfo')!) {
-        this.loggedIn = true;
-        this.user = JSON.parse(localStorage.getItem('user'));
+        this.isLoggedIn = true;
+        this.user = JSON.parse(localStorage.getItem('user')!);
       }
     },
     async signup(
@@ -49,7 +49,7 @@ export const useUserStore = defineStore('user', {
           message: error.value.data.message,
           type: 'error',
         });
-        this.loggedIn = false;
+        this.isLoggedIn = false;
         return false;
       }
       localStorage.setItem(
@@ -78,7 +78,7 @@ export const useUserStore = defineStore('user', {
           message: error.value.data.message,
           type: 'error',
         });
-        this.loggedIn = false;
+        this.isLoggedIn = false;
         return false;
       }
       localStorage.setItem(
@@ -97,21 +97,21 @@ export const useUserStore = defineStore('user', {
           refresh: data.value.refresh,
         }),
       );
-      this.loggedIn = true;
+      this.isLoggedIn = true;
       this.user = { ...this.user, ...data.value };
       return true;
     },
     async logout() {
       localStorage.removeItem('user');
       localStorage.removeItem('userInfo');
-      this.loggedIn = false;
+      this.isLoggedIn = false;
       this.user = null;
     },
     async refresh() {
       const { data, error } = await useInterceptorFetch('/user/token/refresh', {
         method: 'post',
         params: {
-          refresh: JSON.parse(localStorage.getItem('refresh'))?.refresh,
+          refresh: JSON.parse(localStorage.getItem('refresh')!)?.refresh,
         },
       });
       if (error.value) {
@@ -120,7 +120,7 @@ export const useUserStore = defineStore('user', {
           message: error.value.data.message,
           type: 'error',
         });
-        this.loggedIn = false;
+        this.isLoggedIn = false;
         return false;
       }
       localStorage.setItem(

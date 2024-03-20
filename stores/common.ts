@@ -1,12 +1,10 @@
 import { defineStore } from "pinia";
 
-type MessageType = '' | 'error' | 'info';
+export type MessageType = '' | 'error' | 'info';
 
 interface IMessage {
-  messageInfo: {
-    message: string;
-    type: MessageType;
-  };
+  message: string;
+  type: MessageType;
 };
 
 export const useCommonStore = defineStore('common', {

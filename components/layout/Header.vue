@@ -18,12 +18,15 @@
           <li>
             <nuxt-link to="/" @click="toggleBurger">Главная</nuxt-link>
           </li>
-          <li>
-            <nuxt-link to="/sign-in" @click="toggleBurger">Вход</nuxt-link>
-          </li>
-          <li>
-            <nuxt-link to="/sign-up" @click="toggleBurger">Регистрация</nuxt-link>
-          </li>
+          <template v-if="!isLoggedIn">
+            <li>
+              <nuxt-link to="/sign-in" @click="toggleBurger">Вход</nuxt-link>
+            </li>
+            <li>
+              <nuxt-link to="/sign-up" @click="toggleBurger">Регистрация</nuxt-link>
+            </li>
+          </template>
+          <li v-else>Выход</li>
         </ul>
       </div>
       <div class="header__title">
@@ -33,21 +36,31 @@
         <h2>Trello like</h2>
       </div>
       <div class="header-buttons">
-        <nuxt-link class="header__button" to="sign-in">
-          Вход
-        </nuxt-link>
-        <nuxt-link class="header__button" to="sign-up">
-          Регистрация
+        <template v-if="!isLoggedIn">
+          <nuxt-link class="header__button" to="sign-in">
+            Вход
+          </nuxt-link>
+          <nuxt-link class="header__button" to="sign-up">
+            Регистрация
+          </nuxt-link>
+        </template>
+        <nuxt-link v-else class="header__button" to="sign-in">
+          Выход
         </nuxt-link>
       </div>
     </div>
   </header>
 </template>
 <script setup>
+import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 
 const burger = ref();
 const isMenuActive = ref(false);
+
+const userStore = useUserStore();
+
+const { isLoggedIn } = storeToRefs(userStore)
 
 const toggleBurger = () => {
   isMenuActive.value = !isMenuActive.value;
@@ -180,10 +193,10 @@ const toggleBurger = () => {
           padding-top: 5vw;
           font-size: 34px;
           display: block;
+          font-size: 7vw;
           a {
             color: var(--base-color);
             text-decoration: none;
-            font-size: 7vw;
           }
         }
       }
