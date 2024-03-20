@@ -136,8 +136,9 @@ export const useUserStore = defineStore('user', {
         'access',
         data.value.access,
       );
+      this.isLoggedIn = true;
       this.user = { ...this.user, ...data.value };
-      return data.value.access;
+      return `JWT ${data.value.access}`;
     },
   },
 });

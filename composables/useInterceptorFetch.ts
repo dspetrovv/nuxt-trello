@@ -8,9 +8,9 @@ export const useInterceptorFetch = (url, options) => {
 
   return useFetch(serverUrl, {
     ...options,
-    async onResponseError({ request, response, options, ...rest }) {
+    async onResponseError({ request, response, options }) {
       const originalRequest = request;
-      
+
       if (response && response.status === 401 && originalRequest.includes('refresh')) {
         store.logout();
       } else if (
@@ -21,7 +21,8 @@ export const useInterceptorFetch = (url, options) => {
       ) {
         options.__rerty = true;
         const token = await store.refresh();
-        request.headers.common.Authorization = token;
+        options.headers.Authorization = token;
+        
         return useFetch(request, options);
       }
     },
