@@ -42,7 +42,7 @@ const { onMouseDown } = useDragNDrop(handleMoveTask);
   position: relative;
   padding: 25px 10px;
   cursor: move;
-  span {
+  span:not(.task__delete) {
     user-select: none;
     pointer-events: none;
   }
