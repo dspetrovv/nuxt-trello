@@ -2,33 +2,38 @@ export const useInterceptorFetch = (url, options) => {
   const store = useUserStore();
   const router = useRouter();
   const route = useRoute();
+  const config = useRuntimeConfig();
 
-  return useFetch(url, {
+  const serverUrl = `${config.public.host}${url}`;
+
+  return useFetch(serverUrl, {
     ...options,
-    async onResponseError({ request, response }) {
+    async onResponseError({ request, response, options, ...rest }) {
       const originalRequest = request;
-      if (response && response.status === 401 && originalRequest.url.includes('refresh')) {
+      
+      if (response && response.status === 401 && originalRequest.includes('refresh')) {
         store.logout();
       } else if (
         response &&
         response.status === 401 &&
-        !originalRequest._retry &&
-        !originalRequest.url.includes('sign-in')
+        !options.__retry &&
+        !originalRequest.includes('sign-in')
       ) {
-        originalRequest._retry = true;
+        options.__rerty = true;
         const token = await store.refresh();
         request.headers.common.Authorization = token;
+        return useFetch(request, options);
       }
     },
 
     async onRequest({ options, ...rest }) {
-      const access = JSON.parse(localStorage.getItem('access')!);
+      const access = localStorage.getItem('access')!;
       if (access) {
         options.headers = {
           Authorization: 'JWT ' + access,
           Accept: 'application/json',
         };
-      } else {
+      } else if (route.name !== 'sign-up') {
         store.logout(route.name);
         router.replace('/sign-in');
       }
