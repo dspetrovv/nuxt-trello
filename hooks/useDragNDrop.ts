@@ -81,7 +81,7 @@ export const useDragNDrop = (moveTask) => {
     placeholder.value.classList.add("task__placeholder");
     
     placeholder.value.style.height = `${movingElement.value!.getBoundingClientRect().height}px`;
-    movingElement.value!.style.width = `${elementWidth.value}px`;
+    movingElement.value!.style.width = `316px`;
     movingElement.value!.parentNode!.insertBefore(placeholder.value, movingElement.value!);
   };
 
@@ -106,7 +106,7 @@ export const useDragNDrop = (moveTask) => {
       if (currentDroppable.value) {
         if (
           !isAbove(movingElement.value, currentDroppable.value) ||
-          currentDroppable.value.classList.contains("task__item_empty")
+          currentDroppable.value.classList.contains("task_empty")
         ) {
           currentDroppable.value!.parentNode!.insertBefore(
             placeholder.value!,

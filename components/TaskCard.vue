@@ -84,11 +84,18 @@ const { onMouseDown } = useDragNDrop(handleMoveTask);
   &__placeholder {
     background-color: none;
     padding: 0;
+    & + .task.task_empty {
+      height: 0;
+      padding: 0;
+    }
   }
   &_empty {
     cursor: initial;
     background: none;
-    padding: 5px;
+    padding: 0;
+    height: 10px;
+    position: absolute;
+    width: 100%;
   }
 }
 </style>

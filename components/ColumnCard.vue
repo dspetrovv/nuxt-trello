@@ -3,7 +3,7 @@
     <section :class="['column__header', `column__header_${type}`]">
       {{ name }} ({{ tasks.length }})
     </section>
-    <section :class="{column__cards: true, column__cards_empty: !tasks.length}">
+    <section :class="{column__cards: true, column__cards_empty: !tasks.length}" :key="tasks.length">
       <task-card
         v-if="tasks.length"
         v-for="(task) in tasks"
@@ -110,7 +110,7 @@ const moveTask = (params) => {
     gap: 10px;
     padding: 10px;
     &_empty {
-      padding: 0 10px;
+      position: relative;
     }
   }
   &__actions {
