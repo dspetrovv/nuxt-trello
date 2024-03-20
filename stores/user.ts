@@ -6,14 +6,30 @@ interface IUser {
   access: string;
 };
 
+interface IMessage {
+  message: string;
+  type: MessageType
+};
+
 export const useUserStore = defineStore('user', {
   state: () => ({
     user: {} as IUser,
     isLoggedIn: false,
   }),
   actions: {
-    setMessage({message, type}: {message: string, type: MessageType}) {
+    // Сообщения для toast
+    setMessage(
+      {message, type, messages}:
+      IMessage & { messages: IMessage }
+    ) {
       const commonStore = useCommonStore();
+      if (Array.isArray(messages)) {
+        commonStore.setMessages([]);
+        setTimeout(() => {
+          commonStore.setMessages(messages);
+        });
+        return;
+      }
       commonStore.setMessage({
         message: '',
         type: '',
@@ -25,39 +41,43 @@ export const useUserStore = defineStore('user', {
         });
       });
     },
+    getIsResponseError(error) {
+      if (error) {
+        const errors: any[] = [];
+        for (const key in error.data) {
+          for (const err of error.data[key]) {
+            errors.push({ message: err, type: 'error' });
+          }
+        }
+        this.setMessage({ messages: errors });
+        return true;
+      }
+      return false;
+    },
     checkIsLogged() {
-      if (localStorage.getItem('userInfo')!) {
+      if (localStorage.getItem('user')!) {
         this.isLoggedIn = true;
         this.user = JSON.parse(localStorage.getItem('user')!);
       }
     },
+
+    // Регистрация
     async signup(
       { username, email, password }:
       { username: string, email: string, password: string }
       ) {
-      const { data, error } = await useFetch('/users/create', {
-        method: 'post',
-        params: {
+      const { data, error, ...rest } = await useInterceptorFetch('/users/create/', {
+        method: 'POST',
+        body: JSON.stringify({
           username,
           email,
           password,
-        }
+        })
       });
-      if (error.value) {
-        this.user = {};
-        this.setMessage({
-          message: error.value.data.message,
-          type: 'error',
-        });
-        this.isLoggedIn = false;
+      
+      if (this.getIsResponseError(error.value)) {
         return false;
       }
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
-          access: data.value.token,
-        }),
-      );
       this.user = { ...data.value };
       return true;
     },
@@ -65,21 +85,17 @@ export const useUserStore = defineStore('user', {
       { username, password }:
       { username: string, password: string }
     ) {
-      const { data, error } = await useFetch('/users/token', {
-        method: 'post',
-        params: {
+      const { data, error } = await useInterceptorFetch('/users/token/', {
+        method: 'POST',
+        body: JSON.stringify({
           username,
           password,
-        }
+        })
       });
-      if (error.value) {
+      if (this.getIsResponseError(error.value)) {
         this.user = {};
-        this.setMessage({
-          message: error.value.data.message,
-          type: 'error',
-        });
         this.isLoggedIn = false;
-        return false;
+        return;
       }
       localStorage.setItem(
         'user',
@@ -87,15 +103,11 @@ export const useUserStore = defineStore('user', {
       );
       localStorage.setItem(
         'access',
-        JSON.stringify({
-          access: data.value.access,
-        }),
+        data.value.access,
       );
       localStorage.setItem(
         'refresh',
-        JSON.stringify({
-          refresh: data.value.refresh,
-        }),
+        data.value.refresh,
       );
       this.isLoggedIn = true;
       this.user = { ...this.user, ...data.value };
@@ -103,31 +115,26 @@ export const useUserStore = defineStore('user', {
     },
     async logout() {
       localStorage.removeItem('user');
-      localStorage.removeItem('userInfo');
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
       this.isLoggedIn = false;
-      this.user = null;
+      this.user = {};
     },
     async refresh() {
-      const { data, error } = await useInterceptorFetch('/user/token/refresh', {
-        method: 'post',
-        params: {
-          refresh: JSON.parse(localStorage.getItem('refresh')!)?.refresh,
-        },
+      const { data, error } = await useInterceptorFetch('/users/token/refresh/', {
+        method: 'POST',
+        body: JSON.stringify({
+          refresh: localStorage.getItem('refresh')!,
+        }),
       });
-      if (error.value) {
+      if (this.getIsResponseError(error.value)) {
         this.user = {};
-        this.setMessage({
-          message: error.value.data.message,
-          type: 'error',
-        });
         this.isLoggedIn = false;
-        return false;
+        return;
       }
       localStorage.setItem(
         'access',
-        JSON.stringify({
-          access: data.value.access,
-        }),
+        data.value.access,
       );
       this.user = { ...this.user, ...data.value };
       return data.value.access;

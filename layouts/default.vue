@@ -13,7 +13,7 @@ const toastContainer = ref(null);
 
 const commonStore = useCommonStore();
 
-const { messageInfo } = storeToRefs(commonStore);
+const { messageInfo, messages } = storeToRefs(commonStore);
 
 const showToast = (message, type) => {
   const toast = document.createElement('div');
@@ -37,6 +37,14 @@ watch(messageInfo, () => {
     showToast(messageInfo.value.message, messageInfo.value.type);
   }
 });
+
+watch(messages, () => {
+  if (messages.value.length) {
+    messages.value.forEach(message => {
+      showToast(message.message, message.type);
+    });
+  }
+});
 </script>
 <style lang="scss">
 .main {
@@ -57,7 +65,7 @@ watch(messageInfo, () => {
     top: 20px;
     right: 20px;
     max-width: 300px;
-    z-index: 9999;
+    z-index: 1000;
   }
   &_show {
     opacity: 1;

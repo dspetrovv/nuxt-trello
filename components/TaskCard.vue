@@ -52,6 +52,7 @@ const { onMouseDown } = useDragNDrop(handleMoveTask);
   position: relative;
   &__delete {
     position: absolute;
+    z-index: 100;
     top: 10px;
     right: 5px;
     width: 20px;

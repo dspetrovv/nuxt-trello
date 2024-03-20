@@ -13,10 +13,14 @@ export const useCommonStore = defineStore('common', {
       message: '',
       type: '',
     } as IMessage,
+    messages: [] as IMessage[],
   }),
   actions: {
     setMessage({message, type}: {message: string, type: MessageType}) {
       this.messageInfo = { message, type };
+    },
+    setMessages(messages: IMessage[]) {
+      this.messages = messages;
     },
   },
 });
