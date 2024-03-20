@@ -29,6 +29,19 @@ export const useColumnStore = defineStore('column', {
     columns: mockState as IColumn[],
   }),
   actions: {
+    setMessage({message, type}: {message: string, type: string}) {
+      const commonStore = useCommonStore();
+      commonStore.setMessage({
+        message: '',
+        type: '',
+      });
+      setTimeout(() => {
+        commonStore.setMessage({
+          message,
+          type,
+        });
+      });
+    },
     saveColumns() {
       localStorage.setItem('columns', JSON.stringify(this.columns))
     },
@@ -68,14 +81,7 @@ export const useColumnStore = defineStore('column', {
         this.columns[targetColumnIndex].tasks.unshift(task);
       }
       this.saveColumns();
-      const commonStore = useCommonStore();
-      commonStore.setMessage({
-        message: '',
-        type: 'info',
-      });
-      setTimeout(() => {
-        commonStore.setMessage({message:'message', type: 'error'});
-      });
+      this.setMessage({message: task.description, type: 'error'});
     },
   },
 });

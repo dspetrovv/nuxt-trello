@@ -12,6 +12,19 @@ export const useUserStore = defineStore('user', {
     loggedIn: false,
   }),
   actions: {
+    setMessage({message, type}: {message: string, type: string}) {
+      const commonStore = useCommonStore();
+      commonStore.setMessage({
+        message: '',
+        type: '',
+      });
+      setTimeout(() => {
+        commonStore.setMessage({
+          message,
+          type,
+        });
+      });
+    },
     checkIsLogged() {
       if (localStorage.getItem('userInfo')!) {
         this.loggedIn = true;
@@ -30,18 +43,11 @@ export const useUserStore = defineStore('user', {
           password,
         }
       });
-      const commonStore = useCommonStore();
-      commonStore.setMessage({
-        message: '',
-        type: 'info',
-      });
       if (error.value) {
         this.user = {};
-        setTimeout(() => {
-          commonStore.setMessage({
-            message: this.error.value.data.message,
-            type: 'error',
-          });
+        this.setMessage({
+          message: error.value.data.message,
+          type: 'error',
         });
         this.loggedIn = false;
         return false;
@@ -66,18 +72,11 @@ export const useUserStore = defineStore('user', {
           password,
         }
       });
-      const commonStore = useCommonStore();
-      commonStore.setMessage({
-        message: '',
-        type: 'info',
-      });
       if (error.value) {
         this.user = {};
-        setTimeout(() => {
-          commonStore.setMessage({
-            message: this.error.value.data.message,
-            type: 'error',
-          });
+        this.setMessage({
+          message: error.value.data.message,
+          type: 'error',
         });
         this.loggedIn = false;
         return false;
@@ -115,18 +114,11 @@ export const useUserStore = defineStore('user', {
           refresh: JSON.parse(localStorage.getItem('refresh'))?.refresh,
         },
       });
-      const commonStore = useCommonStore();
-      commonStore.setMessage({
-        message: '',
-        type: 'info',
-      });
       if (error.value) {
         this.user = {};
-        setTimeout(() => {
-          commonStore.setMessage({
-            message: this.error.value.data.message,
-            type: 'error',
-          });
+        this.setMessage({
+          message: error.value.data.message,
+          type: 'error',
         });
         this.loggedIn = false;
         return false;
