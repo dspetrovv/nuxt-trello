@@ -16,14 +16,14 @@ export const useInterceptorFetch = (url, options) => {
       } else if (
         response &&
         response.status === 401 &&
-        !options.__retry &&
         !originalRequest.includes('sign-in')
       ) {
-        options.__rerty = true;
         const token = await store.refresh();
         options.headers.Authorization = token;
-        
-        return useFetch(request, options);
+        const newResp = await useFetch(request, options);
+
+        response._data = newResp.data.value;
+        return newResp;
       }
     },
 
@@ -34,6 +34,7 @@ export const useInterceptorFetch = (url, options) => {
           Authorization: 'JWT ' + access,
           Accept: 'application/json',
         };
+        store.login();
       } else if (route.name !== 'sign-up') {
         store.logout(route.name);
         router.replace('/sign-in');

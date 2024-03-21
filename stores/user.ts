@@ -113,6 +113,9 @@ export const useUserStore = defineStore('user', {
       this.user = { ...this.user, ...data.value };
       return true;
     },
+    login() {
+      this.isLoggedIn = true;
+    },
     async logout() {
       localStorage.removeItem('user');
       localStorage.removeItem('access');
