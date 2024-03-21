@@ -36,7 +36,7 @@ export const useColumnStore = defineStore('column', {
       });
     },
     getIsResponseError(error) {
-      if (error) {
+      if (error && error.data?.code !== 'token_not_valid') {
         this.setMessage({
           message: error.data,
           type: 'error',
@@ -48,18 +48,25 @@ export const useColumnStore = defineStore('column', {
     saveColumns() {
       localStorage.setItem('columns', JSON.stringify(this.tasks))
     },
-    async getColumns() {
+    getColumns() {
       this.tasks = JSON.parse(localStorage.getItem('columns')!);
-      const { data, error } = await useInterceptorFetch('/cards/');
+    },
+    async getColumnsAsync() {
+      const { data, error, status } = await useInterceptorFetch('/cards/', {
+        method: 'GET'
+      });
 
-      if (this.getIsResponseError(error.value)) {
+      if (status.value !== 'success' && this.getIsResponseError(error.value)) {
         return;
+      }
+      if (error.value) {
+        data.value = error.value.data;
       }
       this.tasks = data.value ?? [];
       this.saveColumns();
     },
     async createTask({ row, text }: { row: string, text: string }) {
-      const { data, error } = await useInterceptorFetch('/cards/', {
+      const { data, error, status } = await useInterceptorFetch('/cards/', {
         method: 'POST',
         body: {
           row,
@@ -67,23 +74,25 @@ export const useColumnStore = defineStore('column', {
         }
       });
 
-      if (this.getIsResponseError(error.value)) {
+      if (status.value !== 'success' && this.getIsResponseError(error.value)) {
         return;
       }
-      
-      this.tasks.push(data.value);
+      if (error.value) {
+        data.value = error.value.data;
+      }
+
+      this.getColumnsAsync();
       this.saveColumns();
     },
     async deleteTask({ taskId }: { taskId: number }) {
-      const { error } = await useInterceptorFetch(`/cards/${taskId}`, {
+      const { error, status } = await useInterceptorFetch(`/cards/${taskId}`, {
         method: 'delete',
       });
 
-      if (this.getIsResponseError(error.value)) {
+      if (status.value !== 'success' && this.getIsResponseError(error.value)) {
         return;
       }
-      const index = this.tasks.findIndex((task) => task.id === taskId);
-      this.tasks.splice(index, 1);
+      this.getColumnsAsync();
       this.saveColumns();
     },
     async moveTask({
@@ -96,8 +105,6 @@ export const useColumnStore = defineStore('column', {
       prevTaskId: string,
     }) {
       const task = this.tasks.find((task) => task.id === taskId);
-      // const index = this.tasks.findIndex((task) => task.id === taskId);
-      // this.tasks[index].row = row;
 
       const prevTask = this.tasks.find((task) => {
         if (prevTaskId === null) {
@@ -106,22 +113,24 @@ export const useColumnStore = defineStore('column', {
         return task.id === Number(prevTaskId);
       });
 
-      const { data, error } = await useInterceptorFetch(`/cards/${taskId}`, {
+      const seq_num = prevTask?.seq_num ? prevTask.seq_num - 1 : 0;
+
+      if (task.row === row && task.seq_num === seq_num) {
+        return;
+      }
+
+      const { error, status } = await useInterceptorFetch(`/cards/${taskId}`, {
         method: 'PATCH',
         body: {
           row,
-          seq_num: Number(
-            prevTask?.seq_num ? prevTask.seq_num - 1 : 0
-          ),
+          seq_num,
         }
       });
-      if (this.getIsResponseError(error.value)) {
+      if (status.value !== 'success' && this.getIsResponseError(error.value)) {
         return;
       }
-      const index = this.tasks.findIndex((task) => task.id === taskId);
-      this.tasks.splice(index, 1);
-      
-      this.tasks.push(data.value);
+      this.getColumnsAsync();
+
       this.saveColumns();
     },
   },

@@ -44,6 +44,9 @@ const {
 
 onMounted(() => {
   columnStore.getColumns();
+  setTimeout(() => {
+    columnStore.getColumnsAsync();
+  });
 });
 </script>
 <style lang="scss" scoped>
